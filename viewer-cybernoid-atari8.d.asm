@@ -3,37 +3,17 @@
     org     $8000           ;Start of left cartridge area
 
     include "atari.inc"
+    
     include "global.inc"
     include "draw.inc"
-
-; ==========================================
-; Data
-; ==========================================
-SpritesList
-    REPEAT 256
-    .byte $0d
-    REPEND
-Score
-    .byte $00
+    include "init.inc"
+    
 
 ; ==========================================
 ; Program start
 ; ==========================================
 Start:
-    ; set colors
-    lda     #$00
-    sta     COLOR0+4
-    lda     #$72
-    sta     COLOR0+0
-    lda     #$33
-    sta     COLOR0+1
-    lda     #$ec
-    sta     COLOR0+2
-    ; set display list
-    lda     #<dlist            ;Set Display list pointer
-    sta     SDLSTL
-    lda     #>dlist
-    sta     SDLSTH
+    jsr Initialize
     
     ; test buffer 1
     lda #$11
@@ -106,18 +86,6 @@ End
 ImgData1:
 ImgData2 equ ImgData1+40*96
     incbin "cybernoid-atari8.d.bin"
-
-; ==========================================
-;Display list data
-; ==========================================
-dlist
-    .byte $70,$70,$70
-    .byte $4d,#<Buffer1, #>Buffer1
-    REPEAT 95
-    .byte $0d
-    REPEND
-    .byte $41,$00,$10
-dlistend equ .
 
 
 ; ==========================================
