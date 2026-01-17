@@ -4,9 +4,9 @@ DRAW_H  = $CD       ; Height Counter
 MASK_L  = $CE       ; Left byte mask
 MASK_R  = $CF       ; Right byte mask
 SCR_PTR = $D0       ; Calculation pointer (2 bytes)
-COLOR_V = $55
-Buffer1 = $3000
-Buffer2 = $4000
+TMP_LO  = $D2       ; New Temp var for math
+TMP_HI  = $D3       ; New Temp var for math
+COLOR_V = $D4
 
 ; ==========================================
 ;  ROUTINE: DrawRect
@@ -16,23 +16,47 @@ DrawRect:
     ; 1. Calculate Screen Address: BASE + (Y * 40)
     ;    We can use the OS pointer in SAVMSC ($58)
     
-    lda #<Buffer1      ; Load Low Byte of screen base
+    ; 1. Load Y into Pointer
+    lda RECT_Y
     sta SCR_PTR
-    lda #>Buffer1    ; Load High Byte
+    lda #0
     sta SCR_PTR+1
 
-    ldy RECT_Y      ; Loop Y times to add 40 per line
-    beq CalcX       ; Skip if Y=0
-AddYLine:
+    ; 2. Calculate Y * 8 (Shift Left 3 times)
+    asl SCR_PTR
+    rol SCR_PTR+1       ; x2
+    asl SCR_PTR
+    rol SCR_PTR+1       ; x4
+    asl SCR_PTR
+    rol SCR_PTR+1       ; x8
+
+    ; 3. Save the "Y*8" result for later
+    lda SCR_PTR
+    sta TMP_LO
+    lda SCR_PTR+1
+    sta TMP_HI
+
+    ; 4. Continue shifting to get Y * 32 (Shift Left 2 more times)
+    asl SCR_PTR
+    rol SCR_PTR+1       ; x16
+    asl SCR_PTR
+    rol SCR_PTR+1       ; x32
+
+    ; 5. Add them together: (Y*32) + (Y*8) = Y*40
     lda SCR_PTR
     clc
-    adc #40         ; Add 40 bytes (width of Mode 7)
+    adc TMP_LO
     sta SCR_PTR
-    bcc NoCarry
-    inc SCR_PTR+1
-NoCarry:
-    dey
-    bne AddYLine
+    lda SCR_PTR+1
+    adc TMP_HI
+    sta SCR_PTR+1
+
+    ; 6. Add Screen Base Address ($3000)
+    ;    Low byte of $3000 is 0, so we only add High byte
+    lda SCR_PTR+1
+    clc
+    adc ActualBufferAddr + 1            ; High byte of $3000
+    sta SCR_PTR+1
 
 CalcX:
     ; 2. Calculate Byte Offset for X
@@ -67,7 +91,7 @@ DrawLoop:
     ; SCR_PTR points to the start of the current line
     
     ; Draw 8 bytes (32 pixels)
-    lda #COLOR_V
+    lda COLOR_V
     
     sta (SCR_PTR),y
     iny

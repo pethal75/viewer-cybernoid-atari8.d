@@ -3,13 +3,8 @@
     org     $8000           ;Start of left cartridge area
 
     include "atari.inc"
+    include "global.inc"
     include "draw.inc"
-    
-; ==========================================
-; CONSTANTS
-; ==========================================
-Buffer1 = $3000
-Buffer2 = $4000
 
 ; ==========================================
 ; Data
@@ -50,19 +45,59 @@ Start:
     lda     #$22            ;Enable DMA
     sta     SDMCTL
     
+    lda #$ff
+    sta COLOR_V
     lda #30         ; X = 50
     sta RECT_X
     lda #10         ; Y = 30
     sta RECT_Y
 
+    lda #<Buffer1
+    sta ActualBufferAddr
+    lda #>Buffer1
+    sta ActualBufferAddr + 1
+    
     ; infinite loop
-wait
+Begin
+
+    ; Wait for screen
+    lda RTCLOK2
+WaitVBL
+    cmp RTCLOK2
+    beq WaitVBL
+    
+    lda #$00
+    sta COLOR_V
     jsr DrawRect    ; Call routine
+    
+    ; Increase X,Y coordinates
+    inc RECT_X
     inc RECT_X
     inc RECT_Y
+    inc RECT_Y
+    ; Check X,Y coordinates out of screen
+    lda RECT_X
+    cmp #144
+    bcc CheckY      ; If X < 128, skip reset
+    lda #0
+    sta RECT_X
 
+CheckY
+    lda RECT_Y
+    cmp #80
+    bcc DrawContinue     ; If Y < 64, skip reset
+    lda #0
+    sta RECT_Y
+
+DrawContinue
+    lda #$55
+    sta COLOR_V
+    jsr DrawRect    ; Call routine
+    jsr DrawRect    ; Call routine
+ 
+End
     nop
-    jmp     wait
+    jmp     Begin
 
 ; ==========================================
 ;Graphics data
