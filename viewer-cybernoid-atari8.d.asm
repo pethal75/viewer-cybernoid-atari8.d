@@ -1,72 +1,96 @@
-
     processor 6502    
-    include "atari.inc"
+    
+    org     $8000           ;Start of left cartridge area
 
-;GPIOMODE equ 1
-    org     $a000           ;Start of left cartridge area
+    include "atari.inc"
+    include "draw.inc"
+    
+; ==========================================
+; CONSTANTS
+; ==========================================
+Buffer1 = $3000
+Buffer2 = $4000
+
+; ==========================================
+; Data
+; ==========================================
+SpritesList
+    REPEAT 256
+    .byte $0d
+    REPEND
+Score
+    .byte $00
+
+; ==========================================
+; Program start
+; ==========================================
 Start:
- ifconst GPIOMODE
-    lda     #$80
-    sta     GPRIOR
-; set GTIA mode colors
-    lda     #$00;PF4
-    sta     COLOR0 + 0
-    lda     #$00;PF5
-    sta     COLOR0 + 1
-    lda     #$00;PF6
-    sta     COLOR0 + 2
-    lda     #$00;PF7
-    sta     COLOR0 + 3
-    lda     #$00;PF8
-    sta     COLOR0 + 4
- endif
-; set non-GTIA mode colors
+    ; set colors
     lda     #$00
     sta     COLOR0+4
     lda     #$72
     sta     COLOR0+0
-    lda     #$44
+    lda     #$33
     sta     COLOR0+1
-    lda     #$EC
+    lda     #$ec
     sta     COLOR0+2
-; set display list
+    ; set display list
     lda     #<dlist            ;Set Display list pointer
     sta     SDLSTL
     lda     #>dlist
     sta     SDLSTH
-; enable DMI
+    
+    ; test buffer 1
+    lda #$11
+    sta Buffer1
+    sta Buffer1 + 1
+    sta Buffer1 + 5
+    
+    ; enable DMI
     lda     #$22            ;Enable DMA
     sta     SDMCTL
-; infinite loop
+    
+    lda #30         ; X = 50
+    sta RECT_X
+    lda #10         ; Y = 30
+    sta RECT_Y
+
+    ; infinite loop
 wait
+    jsr DrawRect    ; Call routine
+    inc RECT_X
+    inc RECT_Y
+
     nop
     jmp     wait
 
+; ==========================================
 ;Graphics data
+; ==========================================
     align $100   ; ANTIC can only count to $FFF
 ImgData1:
 ImgData2 equ ImgData1+40*96
     incbin "cybernoid-atari8.d.bin"
 
+; ==========================================
 ;Display list data
+; ==========================================
 dlist
     .byte $70,$70,$70
-    .byte $4d,#<ImgData1,#>ImgData1
+    .byte $4d,#<Buffer1, #>Buffer1
     REPEAT 95
     .byte $0d
     REPEND
-    ifconst GPIOMODE
-    .byte $4f,#<ImgData2,#>ImgData2
-    REPEAT 95
-    .byte $0f
-    REPEND
-    endif
     .byte $41,$00,$10
 dlistend equ .
 
+
+; ==========================================
 ;Cartridge footer
+; ==========================================
     org     CARTCS
     .word 	Start	; cold start address
     .byte	$00	; 0 == cart exists
     .byte	$04	; boot cartridge
     .word	Start	; start
+
