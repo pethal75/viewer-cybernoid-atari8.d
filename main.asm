@@ -2,11 +2,13 @@
     
     org     $8000           ;Start of left cartridge area
 
-    include "global.inc"
     include "atari.inc"
+
+    include "global.inc"
+    include "init.inc"
     include "draw.inc"
     include "draw-sprite.inc"
-    include "init.inc"
+    include "game-draw.inc"
 
 ; ==========================================
 ; Program start
@@ -57,8 +59,6 @@ WaitVBL
     beq WaitVBL
 
     ldx  #1
-    include "game-draw.inc"
-
 Pause1:
     ldy #255
 Pause2:
@@ -68,7 +68,6 @@ Pause2:
     sta SPR_Y
     dey
     bne Pause2
-    
     dex
     bne Pause1
     
@@ -183,9 +182,9 @@ DrawContinue
     jsr DrawSprite_16x16_XOR
     lda TmpX
     sta CurrX
-    
-    jsr SwitchScreenBuffer
 
+    jsr SwitchScreenBuffer
+    
 End
     nop
     jmp     Begin
