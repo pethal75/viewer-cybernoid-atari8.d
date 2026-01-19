@@ -1,12 +1,7 @@
-RECT_X  = $CB       ; Input X (0-159)
-RECT_Y  = $CC       ; Input Y (0-96)
-DRAW_H  = $CD       ; Height Counter
-MASK_L  = $CE       ; Left byte mask
-MASK_R  = $CF       ; Right byte mask
-SCR_PTR = $D0       ; Calculation pointer (2 bytes)
-TMP_LO  = $D2       ; New Temp var for math
-TMP_HI  = $D3       ; New Temp var for math
-COLOR_V = $D4
+DRAW_H  = $c4       ; Height Counter
+MASK_L  = $C5       ; Left byte mask
+MASK_R  = $C6       ; Right byte mask
+COLOR_V = $c9
 
 ; ==========================================
 ;  ROUTINE: DrawRect
@@ -109,8 +104,8 @@ DrawLoop:
     tay
 
     ; Move SCR_PTR to next line (+40)
-    lda SCR_PTR
     clc
+    lda SCR_PTR
     adc #40
     sta SCR_PTR
     bcc NextLine

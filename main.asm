@@ -6,6 +6,7 @@
     
     include "global.inc"
     include "draw.inc"
+    include "draw-sprite.inc"
     include "init.inc"
     
 
@@ -16,28 +17,36 @@ Start:
     jsr Initialize
     
     ; test buffer 1
-    lda #$11
+    lda #34
     sta Buffer1
-    sta Buffer1 + 1
-    sta Buffer1 + 5
+    sta Buffer1+80
     
     ; enable DMI
     lda     #$22            ;Enable DMA
     sta     SDMCTL
     
-    lda #$ff
-    sta COLOR_V
-    lda #30         ; X = 50
-    sta RECT_X
-    lda #10         ; Y = 30
-    sta RECT_Y
-
+    ;----------------------------------
+    ; Actual screen buffer set to Buffer1
+    ;----------------------------------
     lda #<Buffer1
     sta ActualBufferAddr
     lda #>Buffer1
     sta ActualBufferAddr + 1
     
-    ; infinite loop
+    ;----------------------------------
+    ; Draw Sprite
+    ;----------------------------------
+    lda #39
+    sta SPR_X
+    lda #1
+    sta SPR_Y
+    
+    lda #<Rocket
+    sta SPR_PTR
+    lda #>Rocket
+    sta SPR_PTR+1
+
+; infinite loop
 Begin
 
     ; Wait for screen
@@ -46,18 +55,31 @@ WaitVBL
     cmp RTCLOK2
     beq WaitVBL
     
+    jsr DrawSprite_16x16_XOR
+    jsr DrawSprite_16x16_XOR
+    jsr DrawSprite_16x16_XOR
+    jsr DrawSprite_16x16_XOR
+    jsr DrawSprite_16x16_XOR
+    jsr DrawSprite_16x16_XOR
+    jsr DrawSprite_16x16_XOR
+    jsr DrawSprite_16x16_XOR
+    jsr DrawSprite_16x16_XOR
+    jsr DrawSprite_16x16_XOR
+    
+    ;----------------------------------
+    ; Draw rectangle
+    ;----------------------------------
     lda #$00
     sta COLOR_V
-    jsr DrawRect    ; Call routine
+    ;jsr DrawRect    ; Call routine
     
     ; Increase X,Y coordinates
-    inc RECT_X
     inc RECT_X
     inc RECT_Y
     inc RECT_Y
     ; Check X,Y coordinates out of screen
     lda RECT_X
-    cmp #144
+    cmp #36
     bcc CheckY      ; If X < 128, skip reset
     lda #0
     sta RECT_X
@@ -70,10 +92,20 @@ CheckY
     sta RECT_Y
 
 DrawContinue
-    lda #$55
-    sta COLOR_V
-    jsr DrawRect    ; Call routine
-    jsr DrawRect    ; Call routine
+    jsr DrawSprite_16x16_XOR
+    jsr DrawSprite_16x16_XOR
+    jsr DrawSprite_16x16_XOR
+    jsr DrawSprite_16x16_XOR
+    jsr DrawSprite_16x16_XOR
+    jsr DrawSprite_16x16_XOR
+    jsr DrawSprite_16x16_XOR
+    jsr DrawSprite_16x16_XOR
+    jsr DrawSprite_16x16_XOR
+    jsr DrawSprite_16x16_XOR
+
+    
+    ;jsr DrawRect    ; Call routine
+    ;jsr DrawRect    ; Call routine
  
 End
     nop
@@ -83,9 +115,9 @@ End
 ;Graphics data
 ; ==========================================
     align $100   ; ANTIC can only count to $FFF
-ImgData1:
-ImgData2 equ ImgData1+40*96
-    incbin "cybernoid-atari8.d.bin"
+    
+Sprites:
+    include "sprites.inc"
 
 
 ; ==========================================
