@@ -33,6 +33,8 @@ CurrX 	= $7101
 CurrY 	= $7102
 OldX	= $7103
 OldY	= $7104
+TmpX	= $7105
+TmpY	= $7106
         
 DlListPtr = $7500
 DlListScreenAddr = $7504

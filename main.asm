@@ -56,8 +56,8 @@ WaitVBL
     cmp RTCLOK2
     beq WaitVBL
 
-    ldx  #3
-	include "game-draw.inc"
+    ldx  #2
+    include "game-draw.inc"
 
 Pause1:
     ldy #255
@@ -71,16 +71,52 @@ Pause2:
     
     dex
     bne Pause1
-        
+    
+    lda OldX
+    sta TmpX
     jsr DrawSprite_16x16_XOR
+    lda OldX
+    adc #5
+    sta OldX
+    sta SPR_X
     jsr DrawSprite_16x16_XOR
+    lda OldX
+    adc #5
+    sta OldX
+    sta SPR_X
     jsr DrawSprite_16x16_XOR
+    lda OldX
+    adc #5
+    sta OldX
+    sta SPR_X
     jsr DrawSprite_16x16_XOR
+    lda OldX
+    adc #5
+    sta OldX
+    sta SPR_X
     jsr DrawSprite_16x16_XOR
+    lda OldX
+    adc #5
+    sta OldX
+    sta SPR_X
     jsr DrawSprite_16x16_XOR
+    lda OldX
+    adc #5
+    sta OldX
+    sta SPR_X
     jsr DrawSprite_16x16_XOR
+    lda OldX
+    adc #5
+    sta OldX
+    sta SPR_X
     jsr DrawSprite_16x16_XOR
+    lda OldX
+    adc #5
+    sta OldX
+    sta SPR_X
     jsr DrawSprite_16x16_XOR
+    lda TmpX
+    sta OldX
 
 ; store position
     lda CurrX
@@ -89,7 +125,7 @@ Pause2:
     sta OldY;
     
     ; Increase X,Y coordinates
-    ;inc CurrX
+    inc CurrX
     inc CurrY
     inc CurrY
     ; Check X,Y coordinates out of screen
@@ -112,15 +148,51 @@ DrawContinue
     lda CurrY
     sta SPR_Y
     
+    lda CurrX
+    sta TmpX
     jsr DrawSprite_16x16_XOR
+    lda CurrX
+    adc #5
+    sta CurrX
+    sta SPR_X
     jsr DrawSprite_16x16_XOR
+    lda CurrX
+    adc #5
+    sta CurrX
+    sta SPR_X
     jsr DrawSprite_16x16_XOR
+    lda CurrX
+    adc #5
+    sta CurrX
+    sta SPR_X
     jsr DrawSprite_16x16_XOR
+    lda CurrX
+    adc #5
+    sta CurrX
+    sta SPR_X
     jsr DrawSprite_16x16_XOR
+    lda CurrX
+    adc #5
+    sta CurrX
+    sta SPR_X
     jsr DrawSprite_16x16_XOR
+    lda CurrX
+    adc #5
+    sta CurrX
+    sta SPR_X
     jsr DrawSprite_16x16_XOR
+    lda CurrX
+    adc #5
+    sta CurrX
+    sta SPR_X
     jsr DrawSprite_16x16_XOR
+    lda CurrX
+    adc #5
+    sta CurrX
+    sta SPR_X
     jsr DrawSprite_16x16_XOR
+    lda TmpX
+    sta CurrX
     
     jsr SwitchScreenBuffer
 
