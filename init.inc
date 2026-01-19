@@ -1,5 +1,6 @@
 Initialize
-    ; set colors
+
+; set colors
     lda     #$00
     sta     COLOR0+4
     lda     #$72
@@ -8,11 +9,18 @@ Initialize
     sta     COLOR0+1
     lda     #$ec
     sta     COLOR0+2
-    ; set display list
+
+; set display list
     lda     #<dlist            ;Set Display list pointer
     sta     SDLSTL
     lda     #>dlist
     sta     SDLSTH
+    
+; enable DMI
+    lda     #$22            ;Enable DMA
+    sta     SDMCTL
+    
+
     rts
     
 ; ==========================================

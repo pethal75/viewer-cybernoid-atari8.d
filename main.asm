@@ -8,7 +8,6 @@
     include "draw.inc"
     include "draw-sprite.inc"
     include "init.inc"
-    
 
 ; ==========================================
 ; Program start
@@ -20,10 +19,6 @@ Start:
     lda #34
     sta Buffer1
     sta Buffer1+80
-    
-    ; enable DMI
-    lda     #$22            ;Enable DMA
-    sta     SDMCTL
     
     ;----------------------------------
     ; Actual screen buffer set to Buffer1
@@ -66,13 +61,6 @@ WaitVBL
     jsr DrawSprite_16x16_XOR
     jsr DrawSprite_16x16_XOR
     
-    ;----------------------------------
-    ; Draw rectangle
-    ;----------------------------------
-    lda #$00
-    sta COLOR_V
-    ;jsr DrawRect    ; Call routine
-    
     ; Increase X,Y coordinates
     inc RECT_X
     inc RECT_Y
@@ -103,10 +91,6 @@ DrawContinue
     jsr DrawSprite_16x16_XOR
     jsr DrawSprite_16x16_XOR
 
-    
-    ;jsr DrawRect    ; Call routine
-    ;jsr DrawRect    ; Call routine
- 
 End
     nop
     jmp     Begin
