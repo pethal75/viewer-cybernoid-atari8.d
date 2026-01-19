@@ -38,9 +38,9 @@ Start:
     sta SPR_X
     lda CurrY
     sta SPR_Y
-    lda #<Rocket
+    lda #<Enemy11
     sta SPR_PTR
-    lda #>Rocket
+    lda #>Enemy11
     sta SPR_PTR+1
 
     jsr SetBuffer1
@@ -58,7 +58,7 @@ WaitVBL
     cmp RTCLOK2
     beq WaitVBL
 
-    ldx  #1
+    ldx  #5
 Pause1:
     ldy #255
 Pause2:
@@ -119,8 +119,8 @@ Pause2:
     sta OldY;
     
     ; Increase X,Y coordinates
-    inc CurrX
-    inc CurrY
+    ;inc CurrX
+    ;inc CurrY
     inc CurrY
     ; Check X,Y coordinates out of screen
     lda CurrX
@@ -182,6 +182,21 @@ DrawContinue
     jsr DrawSprite_16x16_XOR
     lda TmpX
     sta CurrX
+
+    lda #<Enemy10
+    cmp SPR_PTR
+    bne Sprite1
+    lda #<Enemy11
+    sta SPR_PTR
+    lda #>Enemy11
+    sta SPR_PTR+1
+    jmp Continue
+Sprite1:
+    lda #<Enemy10
+    sta SPR_PTR
+    lda #>Enemy10
+    sta SPR_PTR+1
+Continue:
 
     jsr SwitchScreenBuffer
     
