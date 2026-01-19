@@ -56,7 +56,9 @@ WaitVBL
     cmp RTCLOK2
     beq WaitVBL
 
-    ldx  #1
+    ldx  #3
+	include "game-draw.inc"
+
 Pause1:
     ldy #255
 Pause2:
