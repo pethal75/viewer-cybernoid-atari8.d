@@ -56,7 +56,7 @@ WaitVBL
     cmp RTCLOK2
     beq WaitVBL
 
-    ldx  #2
+    ldx  #1
     include "game-draw.inc"
 
 Pause1:
@@ -74,11 +74,6 @@ Pause2:
     
     lda OldX
     sta TmpX
-    jsr DrawSprite_16x16_XOR
-    lda OldX
-    adc #5
-    sta OldX
-    sta SPR_X
     jsr DrawSprite_16x16_XOR
     lda OldX
     adc #5
@@ -137,7 +132,7 @@ Pause2:
 
 CheckY
     lda CurrY
-    cmp #80
+    cmp #96
     bcc DrawContinue     ; If Y < 64, skip reset
     lda #0
     sta CurrY
@@ -150,11 +145,6 @@ DrawContinue
     
     lda CurrX
     sta TmpX
-    jsr DrawSprite_16x16_XOR
-    lda CurrX
-    adc #5
-    sta CurrX
-    sta SPR_X
     jsr DrawSprite_16x16_XOR
     lda CurrX
     adc #5
