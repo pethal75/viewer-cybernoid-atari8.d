@@ -1,3 +1,5 @@
+    align $100   ; ANTIC can only count to $FFF
+
 Rocket:
     .byte $00,$00,$00,$00
     .byte $00,$00,$00,$00

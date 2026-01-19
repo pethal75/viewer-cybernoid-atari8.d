@@ -1,7 +1,7 @@
 Initialize
 
 ; set colors
-    lda     #$00
+    lda     #$03
     sta     COLOR0+4
     lda     #$72
     sta     COLOR0+0
@@ -11,29 +11,24 @@ Initialize
     sta     COLOR0+2
 
 ; set display list
-    lda     #<dlist            ;Set Display list pointer
+    ldy #100
+LoopDl:
+    lda dlist,y
+    sta DlListPtr,y
+    dey
+    bne LoopDl
+    
+    lda     #<DlListPtr            ;Set Display list pointer
     sta     SDLSTL
-    lda     #>dlist
+    lda     #>DlListPtr
     sta     SDLSTH
     
 ; enable DMI
     lda     #$22            ;Enable DMA
     sta     SDMCTL
-    
+
+; Set buffer 1
+    jsr SetBuffer1
 
     rts
-    
-; ==========================================
-;Display list data
-; ==========================================
-dlist
-    .byte $70,$70,$70
-    .byte $4d,#<Buffer1, #>Buffer1
-    REPEAT 95
-    .byte $0d
-    REPEND
-    .byte $41,$00,$10
-dlistend equ .
-
-
 

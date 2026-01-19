@@ -2,9 +2,8 @@
     
     org     $8000           ;Start of left cartridge area
 
-    include "atari.inc"
-    
     include "global.inc"
+    include "atari.inc"
     include "draw.inc"
     include "draw-sprite.inc"
     include "init.inc"
@@ -16,31 +15,38 @@ Start:
     jsr Initialize
     
     ; test buffer 1
-    lda #34
+    lda #$22
     sta Buffer1
     sta Buffer1+80
-    
-    ;----------------------------------
-    ; Actual screen buffer set to Buffer1
-    ;----------------------------------
-    lda #<Buffer1
-    sta ActualBufferAddr
-    lda #>Buffer1
-    sta ActualBufferAddr + 1
+    lda #$21
+    sta Buffer2
+    sta Buffer2+80
     
     ;----------------------------------
     ; Draw Sprite
     ;----------------------------------
-    lda #39
-    sta SPR_X
-    lda #1
-    sta SPR_Y
+    lda #2
+    sta CurrX
+    sta OldX
+    lda #10
+    sta CurrY
+    sta OldY
     
+    lda CurrX
+    sta SPR_X
+    lda CurrY
+    sta SPR_Y
     lda #<Rocket
     sta SPR_PTR
     lda #>Rocket
     sta SPR_PTR+1
 
+    jsr SetBuffer1
+    ;jsr DrawSprite_16x16_XOR
+    jsr SetBuffer2
+    ;jsr DrawSprite_16x16_XOR
+    jsr SwitchScreenBuffer
+    
 ; infinite loop
 Begin
 
@@ -49,7 +55,21 @@ Begin
 WaitVBL
     cmp RTCLOK2
     beq WaitVBL
+
+    ldx  #1
+Pause1:
+    ldy #255
+Pause2:
+    lda OldX;
+    sta SPR_X
+    lda OldY;
+    sta SPR_Y
+    dey
+    bne Pause2
     
+    dex
+    bne Pause1
+        
     jsr DrawSprite_16x16_XOR
     jsr DrawSprite_16x16_XOR
     jsr DrawSprite_16x16_XOR
@@ -59,27 +79,37 @@ WaitVBL
     jsr DrawSprite_16x16_XOR
     jsr DrawSprite_16x16_XOR
     jsr DrawSprite_16x16_XOR
-    jsr DrawSprite_16x16_XOR
+
+; store position
+    lda CurrX
+    sta OldX;
+    lda CurrY
+    sta OldY;
     
     ; Increase X,Y coordinates
-    inc RECT_X
-    inc RECT_Y
-    inc RECT_Y
+    ;inc CurrX
+    inc CurrY
+    inc CurrY
     ; Check X,Y coordinates out of screen
-    lda RECT_X
+    lda CurrX
     cmp #36
     bcc CheckY      ; If X < 128, skip reset
     lda #0
-    sta RECT_X
+    sta CurrX
 
 CheckY
-    lda RECT_Y
+    lda CurrY
     cmp #80
     bcc DrawContinue     ; If Y < 64, skip reset
     lda #0
-    sta RECT_Y
+    sta CurrY
 
 DrawContinue
+    lda CurrX
+    sta SPR_X
+    lda CurrY
+    sta SPR_Y
+    
     jsr DrawSprite_16x16_XOR
     jsr DrawSprite_16x16_XOR
     jsr DrawSprite_16x16_XOR
@@ -89,7 +119,8 @@ DrawContinue
     jsr DrawSprite_16x16_XOR
     jsr DrawSprite_16x16_XOR
     jsr DrawSprite_16x16_XOR
-    jsr DrawSprite_16x16_XOR
+    
+    jsr SwitchScreenBuffer
 
 End
     nop
@@ -98,7 +129,6 @@ End
 ; ==========================================
 ;Graphics data
 ; ==========================================
-    align $100   ; ANTIC can only count to $FFF
     
 Sprites:
     include "sprites.inc"

@@ -26,16 +26,64 @@ TMP_HI  = $c8       ; New Temp var for math
 ; Game engine data
 ; ==========================================
 
-SpritesList
-    REPEAT 256
-    .byte $00
-    REPEND
-Score
-    .byte $00
+SpritesList = $7000
+Score 	= $7100
+    
+CurrX 	= $7101
+CurrY 	= $7102
+OldX	= $7103
+OldY	= $7104
+        
+DlListPtr = $7500
+DlListScreenAddr = $7504
 
 ; ==========================================
 ; Other constants
 ; ==========================================
 RTCLOK2 = $14
+    
 
+; ==========================================
+; Routines
+; ==========================================
+SwitchScreenBuffer:
+    lda ActualBufferAddr + 1
+    cmp #>Buffer1
+    beq SetBuffer2
+    
+SetBuffer1:
+    lda #<Buffer1
+    sta ActualBufferAddr
+    lda #>Buffer1
+    sta ActualBufferAddr + 1
+
+    lda #<Buffer2
+    sta DlListScreenAddr
+    lda #>Buffer2
+    sta DlListScreenAddr + 1
+    rts
+
+SetBuffer2:
+    lda #<Buffer2
+    sta ActualBufferAddr
+    lda #>Buffer2
+    sta ActualBufferAddr + 1
+
+    lda #<Buffer1
+    sta DlListScreenAddr
+    lda #>Buffer1
+    sta DlListScreenAddr + 1
+    rts
+
+; ==========================================
+;Display list data
+; ==========================================
+dlist
+    .byte $70,$70,$70
+    .byte $4d,#<Buffer1, #>Buffer1
+    REPEAT 95
+    .byte $0d
+    REPEND
+    .byte $41,$00,$10
+dlistend equ .
 
