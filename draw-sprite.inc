@@ -57,6 +57,7 @@ RowLoop:
     inc SCR_PTR+1
 NoCarry:
 
+; ===== next sprite row =====
     clc
     lda TMP_PTR
     adc #4

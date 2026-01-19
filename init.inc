@@ -7,7 +7,7 @@ Initialize
     sta     COLOR0+0
     lda     #$33
     sta     COLOR0+1
-    lda     #$ec
+    lda     #$ef
     sta     COLOR0+2
 
 ; set display list
