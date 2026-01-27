@@ -58,7 +58,7 @@ WaitVBL
     cmp RTCLOK2
     beq WaitVBL
 
-    ldx  #5
+    ldx  #2
 Pause1:
     ldy #255
 Pause2:
